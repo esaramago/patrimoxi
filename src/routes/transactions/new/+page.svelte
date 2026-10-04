@@ -15,7 +15,7 @@
       </Grid>
     </a>
     <h1>Create New Transaction</h1>
-    <p>Record a purchase, sale, deposit, withdrawal, dividend, or fee.</p>
+    <p>Record a purchase, sale, deposit, or withdrawal.</p>
   </Grid>
 
   {#if data.accounts.length === 0}

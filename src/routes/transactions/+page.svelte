@@ -87,10 +87,6 @@
         <wa-option value="sell">Sell</wa-option>
         <wa-option value="deposit">Deposit</wa-option>
         <wa-option value="withdrawal">Withdrawal</wa-option>
-        <wa-option value="dividend">Dividend</wa-option>
-        <wa-option value="interest">Interest</wa-option>
-        <wa-option value="fee">Fee</wa-option>
-        <wa-option value="transfer">Transfer</wa-option>
       </wa-select>
     </Grid>
   {/if}
