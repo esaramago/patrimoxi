@@ -28,7 +28,7 @@
       <Grid align="center" gap="s" wrap={true}>
         <h1>
           {formatTransactionTypeName(transaction.type)}
-          {#if transaction.asset}
+          {#if transaction.asset && transaction.type !== 'deposit' && transaction.type !== 'withdrawal'}
             — {transaction.asset}
           {/if}
         </h1>
@@ -95,51 +95,53 @@
             <span>{formatAmount(transaction.amount, transaction.currency || transaction.expand?.account?.currency || 'EUR')}</span>
           </Grid>
 
-          <Grid direction="column" gap="xs">
-            <strong>Currency</strong>
-            <span>{transaction.currency || transaction.expand?.account?.currency || 'EUR'}</span>
-          </Grid>
-
-          {#if transaction.asset}
+          {#if transaction.type !== 'deposit' && transaction.type !== 'withdrawal'}
             <Grid direction="column" gap="xs">
-              <strong>Asset / Ticker</strong>
-              <span>{transaction.asset}</span>
+              <strong>Currency</strong>
+              <span>{transaction.currency || transaction.expand?.account?.currency || 'EUR'}</span>
             </Grid>
-          {/if}
 
-          {#if transaction.quantity != null}
-            <Grid direction="column" gap="xs">
-              <strong>Quantity</strong>
-              <span>{transaction.quantity}</span>
-            </Grid>
-          {/if}
+            {#if transaction.asset}
+              <Grid direction="column" gap="xs">
+                <strong>Asset / Ticker</strong>
+                <span>{transaction.asset}</span>
+              </Grid>
+            {/if}
 
-          {#if transaction.unit_price != null}
-            <Grid direction="column" gap="xs">
-              <strong>Unit Price</strong>
-              <span>{formatAmount(transaction.unit_price, transaction.currency || transaction.expand?.account?.currency || 'EUR')}</span>
-            </Grid>
-          {/if}
+            {#if transaction.quantity != null}
+              <Grid direction="column" gap="xs">
+                <strong>Quantity</strong>
+                <span>{transaction.quantity}</span>
+              </Grid>
+            {/if}
 
-          {#if transaction.fee != null}
-            <Grid direction="column" gap="xs">
-              <strong>Fee</strong>
-              <span>{formatAmount(transaction.fee, transaction.currency || transaction.expand?.account?.currency || 'EUR')}</span>
-            </Grid>
-          {/if}
+            {#if transaction.unit_price != null}
+              <Grid direction="column" gap="xs">
+                <strong>Unit Price</strong>
+                <span>{formatAmount(transaction.unit_price, transaction.currency || transaction.expand?.account?.currency || 'EUR')}</span>
+              </Grid>
+            {/if}
 
-          {#if transaction.tax != null}
-            <Grid direction="column" gap="xs">
-              <strong>Tax</strong>
-              <span>{formatAmount(transaction.tax, transaction.currency || transaction.expand?.account?.currency || 'EUR')}</span>
-            </Grid>
-          {/if}
+            {#if transaction.fee != null}
+              <Grid direction="column" gap="xs">
+                <strong>Fee</strong>
+                <span>{formatAmount(transaction.fee, transaction.currency || transaction.expand?.account?.currency || 'EUR')}</span>
+              </Grid>
+            {/if}
 
-          {#if transaction.exchange_rate != null}
-            <Grid direction="column" gap="xs">
-              <strong>Exchange Rate</strong>
-              <span>{transaction.exchange_rate}</span>
-            </Grid>
+            {#if transaction.tax != null}
+              <Grid direction="column" gap="xs">
+                <strong>Tax</strong>
+                <span>{formatAmount(transaction.tax, transaction.currency || transaction.expand?.account?.currency || 'EUR')}</span>
+              </Grid>
+            {/if}
+
+            {#if transaction.exchange_rate != null}
+              <Grid direction="column" gap="xs">
+                <strong>Exchange Rate</strong>
+                <span>{transaction.exchange_rate}</span>
+              </Grid>
+            {/if}
           {/if}
 
           <Grid direction="column" gap="xs">
@@ -155,7 +157,7 @@
       </Grid>
     </wa-card>
 
-    {#if transaction.notes}
+    {#if transaction.notes && transaction.type !== 'deposit' && transaction.type !== 'withdrawal'}
       <wa-card>
         <Grid direction="column" gap="s">
           <h3>Notes</h3>

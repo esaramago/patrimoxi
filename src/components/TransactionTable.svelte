@@ -72,7 +72,9 @@
             </wa-badge>
           </td>
           <td>
-            {#if transaction.asset}
+            {#if transaction.type === 'deposit' || transaction.type === 'withdrawal'}
+              <span>—</span>
+            {:else if transaction.asset}
               <strong>{transaction.asset}</strong>
               {#if transaction.quantity}
                 <span>({transaction.quantity} @ {transaction.unit_price ?? '—'})</span>

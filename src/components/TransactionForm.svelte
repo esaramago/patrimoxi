@@ -28,8 +28,8 @@
   let currentType = $state<TransactionType>(transaction?.type ?? 'buy')
 
   let selectedAccountObj = $derived(accounts.find((a) => a.id === currentAccount))
-  // svelte-ignore state_referenced_locally
-  let defaultCurrency = transaction?.currency || selectedAccountObj?.currency || 'EUR'
+  let defaultCurrency = $derived(transaction?.currency || selectedAccountObj?.currency || 'EUR')
+  let isSimpleType = $derived(currentType === 'deposit' || currentType === 'withdrawal')
 
   // svelte-ignore state_referenced_locally
   let currentQuantity = $state<string>(transaction?.quantity != null ? String(transaction.quantity) : '')
@@ -85,6 +85,7 @@
   }
 
   function updateDeducedAmount() {
+    if (isSimpleType) return
     const calculated = deduceAmount(
       currentType,
       currentQuantity,
@@ -172,103 +173,109 @@
       ></wa-input>
       <input type="hidden" name="amount_value" value={currentAmount} />
 
-      <wa-input
-        name="currency"
-        label="Currency (ISO 4217)"
-        placeholder="EUR"
-        maxlength="3"
-        value={transaction?.currency || defaultCurrency}
-        required
-      ></wa-input>
+      {#if !isSimpleType}
+        <wa-input
+          name="currency"
+          label="Currency (ISO 4217)"
+          placeholder="EUR"
+          maxlength="3"
+          value={transaction?.currency || defaultCurrency}
+          required
+        ></wa-input>
+      {:else}
+        <input type="hidden" name="currency" value={defaultCurrency} />
+      {/if}
     </Grid>
 
-    <Grid wrap={true} break="small">
-      <wa-input
-        name="asset"
-        label="Asset / Ticker (Optional)"
-        placeholder="e.g. VWCE, AAPL, BTC"
-        value={transaction?.asset ?? ''}
-      ></wa-input>
+    {#if !isSimpleType}
+      <Grid wrap={true} break="small">
+        <wa-input
+          name="asset"
+          label="Asset / Ticker (Optional)"
+          placeholder="e.g. VWCE, AAPL, BTC"
+          value={transaction?.asset ?? ''}
+        ></wa-input>
 
-      <wa-input
-        type="number"
-        name="quantity"
-        label="Quantity (Optional)"
-        placeholder="e.g. 10.5"
-        step="any"
-        value={currentQuantity}
-        oninput={(e: Event) => {
-          currentQuantity = (e.target as HTMLInputElement).value
-          updateDeducedAmount()
-        }}
-      ></wa-input>
-      <input type="hidden" name="quantity_value" value={currentQuantity} />
+        <wa-input
+          type="number"
+          name="quantity"
+          label="Quantity (Optional)"
+          placeholder="e.g. 10.5"
+          step="any"
+          value={currentQuantity}
+          oninput={(e: Event) => {
+            currentQuantity = (e.target as HTMLInputElement).value
+            updateDeducedAmount()
+          }}
+        ></wa-input>
+        <input type="hidden" name="quantity_value" value={currentQuantity} />
 
-      <wa-input
-        type="number"
-        name="unit_price"
-        label="Unit Price (Optional)"
-        placeholder="e.g. 115.50"
-        step="any"
-        value={currentUnitPrice}
-        oninput={(e: Event) => {
-          currentUnitPrice = (e.target as HTMLInputElement).value
-          updateDeducedAmount()
-        }}
-      ></wa-input>
-      <input type="hidden" name="unit_price_value" value={currentUnitPrice} />
-    </Grid>
+        <wa-input
+          type="number"
+          name="unit_price"
+          label="Unit Price (Optional)"
+          placeholder="e.g. 115.50"
+          step="any"
+          value={currentUnitPrice}
+          oninput={(e: Event) => {
+            currentUnitPrice = (e.target as HTMLInputElement).value
+            updateDeducedAmount()
+          }}
+        ></wa-input>
+        <input type="hidden" name="unit_price_value" value={currentUnitPrice} />
+      </Grid>
 
-    <Grid wrap={true} break="small">
-      <wa-input
-        type="number"
-        name="fee"
-        label="Fee (Optional)"
-        placeholder="e.g. 1.00"
-        step="any"
-        value={currentFee}
-        oninput={(e: Event) => {
-          currentFee = (e.target as HTMLInputElement).value
-          updateDeducedAmount()
-        }}
-      ></wa-input>
-      <input type="hidden" name="fee_value" value={currentFee} />
+      <Grid wrap={true} break="small">
+        <wa-input
+          type="number"
+          name="fee"
+          label="Fee (Optional)"
+          placeholder="e.g. 1.00"
+          step="any"
+          value={currentFee}
+          oninput={(e: Event) => {
+            currentFee = (e.target as HTMLInputElement).value
+            updateDeducedAmount()
+          }}
+        ></wa-input>
+        <input type="hidden" name="fee_value" value={currentFee} />
 
-      <wa-input
-        type="number"
-        name="tax"
-        label="Tax (Optional)"
-        placeholder="e.g. 0.00"
-        step="any"
-        value={currentTax}
-        oninput={(e: Event) => {
-          currentTax = (e.target as HTMLInputElement).value
-          updateDeducedAmount()
-        }}
-      ></wa-input>
-      <input type="hidden" name="tax_value" value={currentTax} />
+        <wa-input
+          type="number"
+          name="tax"
+          label="Tax (Optional)"
+          placeholder="e.g. 0.00"
+          step="any"
+          value={currentTax}
+          oninput={(e: Event) => {
+            currentTax = (e.target as HTMLInputElement).value
+            updateDeducedAmount()
+          }}
+        ></wa-input>
+        <input type="hidden" name="tax_value" value={currentTax} />
 
-      <wa-input
-        type="number"
-        name="exchange_rate"
-        label="Exchange Rate (Optional)"
-        placeholder="e.g. 1.00"
-        step="any"
-        value={currentExchangeRate}
-        oninput={(e: Event) => {
-          currentExchangeRate = (e.target as HTMLInputElement).value
-          updateDeducedAmount()
-        }}
-      ></wa-input>
-      <input type="hidden" name="exchange_rate_value" value={currentExchangeRate} />
-    </Grid>
+        <wa-input
+          type="number"
+          name="exchange_rate"
+          label="Exchange Rate (Optional)"
+          placeholder="e.g. 1.00"
+          step="any"
+          value={currentExchangeRate}
+          oninput={(e: Event) => {
+            currentExchangeRate = (e.target as HTMLInputElement).value
+            updateDeducedAmount()
+          }}
+        ></wa-input>
+        <input type="hidden" name="exchange_rate_value" value={currentExchangeRate} />
+      </Grid>
 
-    <wa-textarea
-      name="notes"
-      label="Notes (Optional)"
-      placeholder="Broker reference, dividend period, transfer details..."
-      value={transaction?.notes ?? ''}
-    ></wa-textarea>
+      <wa-textarea
+        name="notes"
+        label="Notes (Optional)"
+        placeholder="Broker reference, dividend period, transfer details..."
+        value={transaction?.notes ?? ''}
+      ></wa-textarea>
+    {/if}
 
     <Grid wrap={true}>
       <wa-button type="submit" variant="brand">

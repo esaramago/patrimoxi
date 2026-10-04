@@ -39,7 +39,15 @@ export const actions: Actions = {
     const type = ((formData.get('type_value') ?? formData.get('type')) as string || '').trim()
     const dateRaw = ((formData.get('date') as string) || '').trim()
     const amountRaw = (formData.get('amount_value') ?? formData.get('amount')) as string
-    const currency = (((formData.get('currency') as string) || 'EUR').trim()).toUpperCase()
+    let currency = (((formData.get('currency') as string) || '').trim()).toUpperCase()
+    if (!currency) {
+      try {
+        const acc = await locals.pb.collection('accounts').getOne(account)
+        currency = (acc.currency || 'EUR').toUpperCase()
+      } catch {
+        currency = 'EUR'
+      }
+    }
     const asset = ((formData.get('asset') as string) || '').trim()
     const quantityRaw = (formData.get('quantity_value') ?? formData.get('quantity')) as string
     const unitPriceRaw = (formData.get('unit_price_value') ?? formData.get('unit_price')) as string
@@ -60,6 +68,8 @@ export const actions: Actions = {
       return fail(400, { message: 'Date is required.' })
     }
 
+    const isSimpleType = type === 'deposit' || type === 'withdrawal'
+
     let amount = Number(amountRaw)
     const quantity = quantityRaw && !isNaN(Number(quantityRaw)) ? Number(quantityRaw) : null
     const unitPrice = unitPriceRaw && !isNaN(Number(unitPriceRaw)) ? Number(unitPriceRaw) : null
@@ -71,7 +81,7 @@ export const actions: Actions = {
         : 1
 
     // Deduce amount from quantity, unit price, fee, tax, and exchange rate if not directly specified
-    if ((isNaN(amount) || amount === 0) && quantity != null && unitPrice != null) {
+    if (!isSimpleType && (isNaN(amount) || amount === 0) && quantity != null && unitPrice != null) {
       const base = quantity * unitPrice * exchangeRate
       if (type === 'buy') {
         amount = base + fee + tax
@@ -100,27 +110,29 @@ export const actions: Actions = {
       date: dateIso,
       amount,
       currency,
-      notes,
+      notes: isSimpleType ? '' : notes,
       user: locals.user.id
     }
 
-    if (asset) {
-      payload.asset = asset
-    }
-    if (quantity != null) {
-      payload.quantity = quantity
-    }
-    if (unitPrice != null) {
-      payload.unit_price = unitPrice
-    }
-    if (feeRaw && !isNaN(Number(feeRaw))) {
-      payload.fee = Number(feeRaw)
-    }
-    if (taxRaw && !isNaN(Number(taxRaw))) {
-      payload.tax = Number(taxRaw)
-    }
-    if (exchangeRateRaw && !isNaN(Number(exchangeRateRaw))) {
-      payload.exchange_rate = Number(exchangeRateRaw)
+    if (!isSimpleType) {
+      if (asset) {
+        payload.asset = asset
+      }
+      if (quantity != null) {
+        payload.quantity = quantity
+      }
+      if (unitPrice != null) {
+        payload.unit_price = unitPrice
+      }
+      if (feeRaw && !isNaN(Number(feeRaw))) {
+        payload.fee = Number(feeRaw)
+      }
+      if (taxRaw && !isNaN(Number(taxRaw))) {
+        payload.tax = Number(taxRaw)
+      }
+      if (exchangeRateRaw && !isNaN(Number(exchangeRateRaw))) {
+        payload.exchange_rate = Number(exchangeRateRaw)
+      }
     }
 
     let createdId: string
