@@ -12,6 +12,8 @@
   import '@awesome.me/webawesome/dist/components/switch/switch.js'
   import '@awesome.me/webawesome/dist/components/textarea/textarea.js'
   import '@awesome.me/webawesome/dist/components/divider/divider.js'
+  import '@awesome.me/webawesome/dist/components/dropdown/dropdown.js'
+  import '@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js'
   import Header from '@/components/Header.svelte'
   import Footer from '@/components/Footer.svelte'
   import Grid from '@/components/Grid.svelte'

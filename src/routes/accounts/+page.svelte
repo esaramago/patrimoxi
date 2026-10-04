@@ -8,6 +8,19 @@
   let accounts = $derived<Account[]>(data.accounts ?? [])
   let activeCount = $derived(accounts.filter((a) => a.active).length)
   let inactiveCount = $derived(accounts.filter((a) => !a.active).length)
+
+  function handleSelect(accountId: string, event: Event) {
+    const customEvent = event as CustomEvent<{ item?: { value?: string } }>
+    const value = customEvent.detail?.item?.value
+
+    if (value === 'toggle') {
+      const form = document.getElementById(`toggle-form-${accountId}`) as HTMLFormElement | null
+      form?.requestSubmit()
+    } else if (value === 'delete') {
+      const form = document.getElementById(`delete-form-${accountId}`) as HTMLFormElement | null
+      form?.requestSubmit()
+    }
+  }
 </script>
 
 <Grid direction="column" gap="xl">
@@ -88,28 +101,50 @@
               {/if}
             </td>
             <td>
-              <Grid align="center" gap="xs">
-                <wa-button href="/accounts/{account.id}" size="small" variant="neutral">
-                  <wa-icon slot="start" name="eye"></wa-icon>
+              <wa-dropdown placement="bottom-end" onwa-select={(e: Event) => handleSelect(account.id, e)}>
+                <wa-button slot="trigger" size="small" variant="neutral" aria-label="Actions">
+                  <wa-icon name="ellipsis-vertical"></wa-icon>
+                </wa-button>
+                <wa-dropdown-item value="view" href="/accounts/{account.id}">
+                  <wa-icon slot="icon" name="eye"></wa-icon>
                   View
-                </wa-button>
-                <wa-button href="/accounts/{account.id}/edit" size="small" variant="neutral">
-                  <wa-icon slot="start" name="pen-to-square"></wa-icon>
+                </wa-dropdown-item>
+                <wa-dropdown-item value="edit" href="/accounts/{account.id}/edit">
+                  <wa-icon slot="icon" name="pen-to-square"></wa-icon>
                   Edit
-                </wa-button>
-                <form method="POST" action="?/toggleActive">
-                  <input type="hidden" name="id" value={account.id} />
-                  <wa-button type="submit" size="small" variant="text">
-                    {#if account.active}
-                      <wa-icon slot="start" name="pause"></wa-icon>
-                      Deactivate
-                    {:else}
-                      <wa-icon slot="start" name="play"></wa-icon>
-                      Activate
-                    {/if}
-                  </wa-button>
-                </form>
-              </Grid>
+                </wa-dropdown-item>
+                <wa-dropdown-item value="toggle">
+                  {#if account.active}
+                    <wa-icon slot="icon" name="pause"></wa-icon>
+                    Deactivate
+                  {:else}
+                    <wa-icon slot="icon" name="play"></wa-icon>
+                    Activate
+                  {/if}
+                </wa-dropdown-item>
+                <wa-divider></wa-divider>
+                <wa-dropdown-item value="delete" variant="danger">
+                  <wa-icon slot="icon" name="trash"></wa-icon>
+                  Delete
+                </wa-dropdown-item>
+              </wa-dropdown>
+
+              <form id="toggle-form-{account.id}" method="POST" action="?/toggleActive">
+                <input type="hidden" name="id" value={account.id} />
+              </form>
+
+              <form
+                id="delete-form-{account.id}"
+                method="POST"
+                action="?/delete"
+                onsubmit={(e) => {
+                  if (!confirm('Are you sure you want to delete this account?')) {
+                    e.preventDefault()
+                  }
+                }}
+              >
+                <input type="hidden" name="id" value={account.id} />
+              </form>
             </td>
           </tr>
         {/each}
