@@ -15,14 +15,24 @@
     </a>
 
     {#if user}
-      <Grid align="center" gap="s">
-        <span>{user.name || user.email}</span>
-        <form method="POST" action="/logout">
-          <wa-button type="submit" size="small" variant="neutral">
-            <wa-icon slot="start" name="arrow-right-from-bracket"></wa-icon>
-            Sign Out
-          </wa-button>
-        </form>
+      <Grid align="center" gap="l">
+        <nav>
+          <Grid align="center" gap="s">
+            <wa-button href="/accounts" size="small" variant="neutral">
+              <wa-icon slot="start" name="wallet"></wa-icon>
+              Accounts
+            </wa-button>
+          </Grid>
+        </nav>
+        <Grid align="center" gap="s">
+          <span>{user.name || user.email}</span>
+          <form method="POST" action="/logout">
+            <wa-button type="submit" size="small" variant="neutral">
+              <wa-icon slot="start" name="arrow-right-from-bracket"></wa-icon>
+              Sign Out
+            </wa-button>
+          </form>
+        </Grid>
       </Grid>
     {:else}
       <Grid align="center" gap="s">

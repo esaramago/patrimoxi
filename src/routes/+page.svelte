@@ -23,9 +23,9 @@
 
     <Grid wrap={true}>
       {#if user}
-        <wa-button variant="brand" href="/dashboard">
-          <wa-icon slot="start" name="chart-pie" variant="solid"></wa-icon>
-          View Dashboard
+        <wa-button variant="brand" href="/accounts">
+          <wa-icon slot="start" name="wallet" variant="solid"></wa-icon>
+          Manage Accounts
         </wa-button>
       {:else}
         <wa-button variant="brand" href="/login">

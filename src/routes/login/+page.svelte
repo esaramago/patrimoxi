@@ -6,7 +6,7 @@
 </script>
 
 <Grid direction="column" align="center" gap="xl">
-  <wa-card style="max-width: 440px; width: 100%;">
+  <wa-card>
     <Grid direction="column" gap="l">
       <Grid direction="column" gap="xs" align="center">
         <wa-icon name="wallet" variant="solid"></wa-icon>
