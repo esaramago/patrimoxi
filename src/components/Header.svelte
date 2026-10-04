@@ -22,6 +22,10 @@
               <wa-icon slot="start" name="wallet"></wa-icon>
               Accounts
             </wa-button>
+            <wa-button href="/transactions" size="small" variant="neutral">
+              <wa-icon slot="start" name="receipt"></wa-icon>
+              Transactions
+            </wa-button>
           </Grid>
         </nav>
         <Grid align="center" gap="s">

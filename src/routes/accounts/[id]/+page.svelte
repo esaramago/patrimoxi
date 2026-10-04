@@ -1,11 +1,14 @@
 <script lang="ts">
   import Grid from '@/components/Grid.svelte'
+  import TransactionTable from '@/components/TransactionTable.svelte'
   import type { Account } from '@/types/account'
+  import type { Transaction } from '@/types/transaction'
   import type { ActionData, PageData } from './$types'
 
   let { data, form }: { data: PageData; form: ActionData } = $props()
 
   let account = $derived<Account>(data.account)
+  let transactions = $derived<Transaction[]>(data.transactions ?? [])
 
   function formatDate(isoString: string): string {
     if (!isoString) return '—'
@@ -126,16 +129,26 @@
       </wa-card>
     {/if}
 
-    <wa-card>
-      <Grid direction="column" gap="s">
+    <Grid direction="column" gap="s">
+      <Grid align="center" justify="space-between" wrap={true}>
         <Grid align="center" gap="s">
-          <wa-icon name="chart-pie" variant="solid"></wa-icon>
-          <h3>Holdings & Transactions</h3>
+          <wa-icon name="receipt" variant="solid"></wa-icon>
+          <h3>Transactions</h3>
+          <wa-badge variant="brand">{transactions.length}</wa-badge>
         </Grid>
-        <p>
-          Holdings and transaction history linked to this account will appear here as entries are registered.
-        </p>
+
+        <wa-button variant="brand" size="small" href="/transactions/new?account={account.id}">
+          <wa-icon slot="start" name="plus"></wa-icon>
+          New Transaction
+        </wa-button>
       </Grid>
-    </wa-card>
+
+      <TransactionTable
+        transactions={transactions}
+        showAccount={false}
+        newHref="/transactions/new?account={account.id}"
+        deleteAction="?/deleteTransaction"
+      />
+    </Grid>
   </Grid>
 </Grid>
