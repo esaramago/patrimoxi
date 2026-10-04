@@ -80,8 +80,21 @@ export const actions: Actions = {
         ? Number(exchangeRateRaw)
         : 1
 
-    // Deduce amount from quantity, unit price, fee, tax, and exchange rate if not directly specified
-    if (!isSimpleType && (isNaN(amount) || amount === 0) && quantity != null && unitPrice != null) {
+    if ((type === 'buy' || type === 'sell') && (quantity == null || unitPrice == null)) {
+      return fail(400, { message: 'Quantity and unit price are required for buy and sell transactions.' })
+    }
+
+    // Deduce amount from quantity, unit price, fee, tax, and exchange rate
+    if ((type === 'buy' || type === 'sell') && quantity != null && unitPrice != null) {
+      const base = quantity * unitPrice * exchangeRate
+      if (type === 'buy') {
+        amount = base + fee + tax
+      } else {
+        amount = base - fee - tax
+      }
+      amount = Math.round((amount + Number.EPSILON) * 10000) / 10000
+      if (amount < 0) amount = 0
+    } else if (!isSimpleType && (isNaN(amount) || amount === 0) && quantity != null && unitPrice != null) {
       const base = quantity * unitPrice * exchangeRate
       if (type === 'buy') {
         amount = base + fee + tax
@@ -90,7 +103,8 @@ export const actions: Actions = {
       } else {
         amount = base + fee + tax
       }
-      amount = Math.round((amount + Number.EPSILON) * 100) / 100
+      amount = Math.round((amount + Number.EPSILON) * 10000) / 10000
+      if (amount < 0) amount = 0
     }
 
     if (isNaN(amount) || amount < 0) {

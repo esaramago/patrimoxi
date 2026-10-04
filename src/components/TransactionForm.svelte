@@ -30,6 +30,7 @@
   let selectedAccountObj = $derived(accounts.find((a) => a.id === currentAccount))
   let defaultCurrency = $derived(transaction?.currency || selectedAccountObj?.currency || 'EUR')
   let isSimpleType = $derived(currentType === 'deposit' || currentType === 'withdrawal')
+  let isBuyOrSell = $derived(currentType === 'buy' || currentType === 'sell')
 
   // svelte-ignore state_referenced_locally
   let currentQuantity = $state<string>(transaction?.quantity != null ? String(transaction.quantity) : '')
@@ -84,17 +85,20 @@
     return hasMoreDecimals ? String(rounded) : rounded.toFixed(2)
   }
 
-  function updateDeducedAmount() {
-    if (isSimpleType) return
+  function updateDeducedAmount(type: TransactionType = currentType) {
+    if (type === 'deposit' || type === 'withdrawal') return
     const calculated = deduceAmount(
-      currentType,
+      type,
       currentQuantity,
       currentUnitPrice,
       currentFee,
       currentTax,
       currentExchangeRate
     )
-    if (calculated !== '') {
+    const isBuySell = type === 'buy' || type === 'sell'
+    if (isBuySell) {
+      currentAmount = calculated
+    } else if (calculated !== '') {
       currentAmount = calculated
     }
   }
@@ -133,7 +137,7 @@
         onchange={(e: Event) => {
           const target = e.target as HTMLSelectElement
           currentType = target.value as TransactionType
-          updateDeducedAmount()
+          updateDeducedAmount(currentType)
         }}
         required
       >
@@ -166,8 +170,11 @@
         step="any"
         min="0"
         value={currentAmount}
+        readonly={isBuyOrSell ? true : undefined}
         oninput={(e: Event) => {
-          currentAmount = (e.target as HTMLInputElement).value
+          if (!isBuyOrSell) {
+            currentAmount = (e.target as HTMLInputElement).value
+          }
         }}
         required
       ></wa-input>
@@ -199,11 +206,17 @@
         <wa-input
           type="number"
           name="quantity"
-          label="Quantity (Optional)"
+          label={isBuyOrSell ? 'Quantity' : 'Quantity (Optional)'}
           placeholder="e.g. 10.5"
           step="any"
+          min="0"
           value={currentQuantity}
+          required={isBuyOrSell ? true : undefined}
           oninput={(e: Event) => {
+            currentQuantity = (e.target as HTMLInputElement).value
+            updateDeducedAmount()
+          }}
+          onchange={(e: Event) => {
             currentQuantity = (e.target as HTMLInputElement).value
             updateDeducedAmount()
           }}
@@ -213,11 +226,17 @@
         <wa-input
           type="number"
           name="unit_price"
-          label="Unit Price (Optional)"
+          label={isBuyOrSell ? 'Unit Price' : 'Unit Price (Optional)'}
           placeholder="e.g. 115.50"
           step="any"
+          min="0"
           value={currentUnitPrice}
+          required={isBuyOrSell ? true : undefined}
           oninput={(e: Event) => {
+            currentUnitPrice = (e.target as HTMLInputElement).value
+            updateDeducedAmount()
+          }}
+          onchange={(e: Event) => {
             currentUnitPrice = (e.target as HTMLInputElement).value
             updateDeducedAmount()
           }}
