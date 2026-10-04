@@ -13,6 +13,6 @@ Personal wealth tracking application to register bank accounts and investments, 
 - Do not commit any changes.
 
 ## Notes
-- This project is probably going to be hosted on Coolify.
+- This project is hosted on Coolify.
 - Web runs on port 3000, PocketBase runs on port 8090.
 - Authentication: Login page configured with PocketBase auth. No registration page (single user).

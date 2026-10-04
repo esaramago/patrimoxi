@@ -13,51 +13,6 @@ Personal Wealth Tracking Application built with SvelteKit, PocketBase, and WebAw
 
 ---
 
-## 📐 Guidelines & Conventions
-
-1. **No Tailwind:** This project does not use Tailwind CSS.
-2. **Layout with `Grid.svelte`:** Use the `Grid.svelte` component (`@/components/Grid.svelte`) whenever possible to structure layouts and element alignment.
-3. **Elements with WebAwesome:** Use WebAwesome web components (`<wa-...>`) for buttons, icons, cards, inputs, and other interface elements.
-4. **Minimal CSS:** Do not add CSS rules or classes unnecessarily. Keep styles clean and let components handle structure.
-5. **No Redundant Attributes:** Do not specify default prop values (e.g. avoid `<Grid gap="m" />` since `m` is default).
-6. **Separate Header & Footer:** Header and Footer are separate, reusable components.
-
----
-
-## 📁 Project Structure
-
-```text
-.
-├── docker-compose.yml       # Local / Coolify orchestration (SvelteKit + PocketBase)
-├── Dockerfile               # Multi-stage build optimized for production
-├── src/
-│   ├── app.d.ts             # Global typings and PocketBase session types
-│   ├── app.html             # Base HTML template
-│   ├── hooks.server.ts      # PocketBase auth hook and session management
-│   ├── components/
-│   │   ├── Grid.svelte      # Base layout and flex alignment component
-│   │   ├── Header.svelte    # Application header component
-│   │   └── Footer.svelte    # Application footer component
-│   ├── css/
-│   │   ├── main.css         # Main CSS entry point
-│   │   ├── base/            # Reset and WebAwesome theme variables
-│   │   └── layout/          # Containers and layout utilities
-│   ├── lib/
-│   │   └── pocketbase.ts    # PocketBase client instance and user store
-│   ├── routes/
-│   │   ├── +layout.svelte   # Root layout (Header, Grid, Footer, global styles)
-│   │   ├── +layout.server.ts# Auth session pass-through to layout data
-│   │   ├── +page.svelte     # Starter home page
-│   │   ├── login/           # Authentication login page
-│   │   └── logout/          # Sign out action endpoint
-│   └── types/
-│       └── grid.ts          # Types and props for Grid.svelte
-├── AGENTS.md                # Agent instructions and rules
-└── LICENSE                  # MIT License
-```
-
----
-
 ## 🛠️ Getting Started
 
 ### Prerequisites
@@ -116,18 +71,12 @@ This application allows you to register your bank accounts and investments, trac
 #### 1.1 Database (PocketBase)
 PocketBase functions as the single backend, hosted alongside the frontend application. It manages user authentication, data storage, and provides an automatic REST API.
 
-| Collection | Function | Key Fields |
-|---|---|---|
-| `accounts` | Represents each account or broker holding assets | Account name, type (bank/investment/crypto), base currency, financial institution, active/inactive status |
-| `transactions` | Records each individual movement | Associated account, date, description, amount, category (buy/sell/dividend/deposit), asset type, symbol/ticker, quantity, price, fees, notes |
-| `holdings` | Current positions per asset in each account | Associated account, ticker, asset type, quantity held, average acquisition cost, last known price, last update date |
-| `snapshots` | Daily history of total value | Associated account, date/time, total value in base currency, exchange rate applied |
-| `api_keys` | Stored external credentials | Provider (Yahoo/Treasury/Frankfurt/FIGI), encrypted key, active status |
-
-Relationships between collections:
-- Each account can have many transactions
-- Each account can have multiple holdings
-- Each snapshot is linked to a single account and specific date
+| Collection | Function |
+|---|---|
+| `accounts` | Represents each account or broker holding assets |
+| `transactions` | Records each individual movement |
+| `holdings` | Current positions per asset in each account |
+| `snapshots` | Daily history of total value |
 
 ### 2. Daily Data Flow
 
@@ -162,12 +111,9 @@ For each active account:
 - Add new account (name, type, institution, currency)
 - Edit existing information
 - Deactivate account without deleting history
-- View current estimated balance vs. historical
 
 #### 3.2 Transaction Management
 - Manual entries with essential fields
-- Automatic categorization rules (e.g. transactions from bank "XX" with description "Dividends" classify as "dividend")
-- Partial import (CSV from bank statement or broker, planned)
 
 #### 3.3 Net Worth Visualization
 Main dashboard with three elements:
